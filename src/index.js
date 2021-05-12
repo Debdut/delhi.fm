@@ -4,7 +4,7 @@ window.addEventListener('load', async function onLoad () {
   const albums = await getAlbums()
   const controller = document.body
 
-  const player = new SequencePlayer(albums, controller, onToggle, onAlbumChange)
+  const player = new SequencePlayer(albums, controller, onToggle, updateView)
 })
 
 function onToggle () {
@@ -26,16 +26,15 @@ async function getAlbums () {
 }
 
 class SequencePlayer {
-  constructor(albums, controller, onToggle, onAlbumChange) {
+  constructor(albums, controller, onToggle, updateView) {
     this.albums = albums
     this.audios = []
     this.albumN = 2
     this.trackN = 0
     this.onToggle = onToggle
-    this.onAlbumChange = onAlbumChange
+    this.updateView = updateView
 
     this.loadTrack()
-    this.onAlbumChange(this.album)
 
     const that = this
 
@@ -60,6 +59,7 @@ class SequencePlayer {
     } else {
       this.play()
     }
+
     this.onToggle()
     this.on = !this.on
   }
@@ -72,7 +72,7 @@ class SequencePlayer {
       this.trackN = trackN
     }
 
-    const audioPath = this.album.tracks[this.trackN].path
+    const audioPath = this.track.path
     const audio = new Audio(audioPath)
 
     this.audios.push(audio)
@@ -86,7 +86,6 @@ class SequencePlayer {
     let numTracks = this.album.tracks.length
     if (this.trackN === numTracks - 1) {
       this.trackN = 0
-      this.nextAlbum()
     } else {
       this.trackN += 1
     }
@@ -98,7 +97,6 @@ class SequencePlayer {
       this.albumN = 0
     } else {
       this.albumN += 1
-      this.onAlbumChange(this.album)
     }
   }
 
@@ -106,7 +104,13 @@ class SequencePlayer {
     return this.albums[this.albumN]
   }
 
+  get track () {
+    return this.album.tracks[this.trackN]
+  }
+
   play () {
+    this.updateView(this.album, this.track)
+
     if (!this.audio) {
       this.audio = this.unloadTrack()
       this.nextTrack()
@@ -125,21 +129,44 @@ class SequencePlayer {
   }
 
   pause () {
+    this.updateView()
     if (this.audio) {
       this.audio.pause()
     }
   }
 }
 
-function onAlbumChange (album) {
-  const view = PlayerView(album)
+let view
+function updateView (album, track) {
+  if (document.body.offsetWidth < 900) {
+    return
+  }
+
+  if (!album && !track) {
+    view.parentNode.removeChild(view)
+    return
+  }
+
+  view = PlayerView(album, track)
   document.body.appendChild(view)
+
+  setTimeout(function () {
+    document.querySelector('.player-view .back')
+    .classList.add('active')
+  }, 1000) 
+  
 }
 
-function PlayerView (album) {
+function PlayerView (album, track) {
   const view = m('div', { className: 'player-view' }, [
-    m('img', { src: album.cover }),
-    m('h2', album.title)
+    m('div', { className: 'front' }, [
+      m('img', { src: album.cover }),
+      m('h2', album.title),
+      m('h3', track.title)
+    ]),
+    m('div', { className: 'back' }, [
+      m('img', { src: album.cover }),
+    ])
   ])
 
   return view

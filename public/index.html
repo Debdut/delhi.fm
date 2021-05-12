@@ -33,7 +33,12 @@
       to   { opacity: 1; }
     }
 
-    img {
+    body {
+      color: white;
+      background: black;
+    }
+
+    img.hero {
       margin-top: 50px;
       margin-left: 30px;
       animation-name: slideInDown;
@@ -41,10 +46,10 @@
       animation-timing-function: cubic-bezier(0,1.29,.59,1.6);
     }
 
-    code {
+    header code {
       padding: 0 4px;
       border-radius: 4px;
-      background-color: #eee;
+      background-color: #444;
     }
 
     header {
@@ -62,10 +67,6 @@
       font-weight: 400;
     }
 
-    header span.action {
-      font-size: 16px;
-    }
-
     footer {
       position: absolute;
       bottom: 20px;
@@ -74,12 +75,11 @@
 
     footer a {
       text-decoration: none;
-      color: rgb(31, 116, 244);
-
+      color: white;
     }
 
     @media only screen and (max-width: 600px) {
-      img {
+      img.hero {
         width: 150px;
         margin-left: 20px;
       }
@@ -94,11 +94,48 @@
         font-size: 40px;
       }
     }
+
+    .player-view .front {
+      position: absolute;
+      top: 50px;
+      right: 50px;
+      animation: fadein 6s;
+    }
+
+    h2 {
+      font-size: 30px;
+    }
+
+    .player-view .back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -100;
+      transition: opacity 6s;
+      opacity: 0;
+    }
+
+    .player-view .back.active {
+      opacity: 1;
+    }
+
+    .player-view .front img {
+      width: 350px;
+      border-radius: 10px;
+      box-shadow: 4px 4px 22px -2px rgba(0,0,0,0.75);
+      margin-bottom: 30px;
+    }
+
+    .player-view .back img {
+      min-width: 100vw;
+      backdrop-filter: blur(20px);
+      opacity: .3;
+    }
   </style>
 </head>
 <body>
   <main>
-    <img src="assets/note.svg" />
+    <img class="hero" src="assets/note.svg" />
     <header class="header">
       <h1> Delhi FM</h1>
       <p class="instruction">Press <code>Space</code> or Tap to <span class="action">▶️</span></p>

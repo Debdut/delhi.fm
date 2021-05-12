@@ -2,9 +2,9 @@
         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
             <g id="Note" transform="translate(-122.000000, -1.000000)">
                 <g id="Group" transform="translate(122.000000, 1.000000)">
-                    <ellipse id="Oval" stroke="#4B4A4A" stroke-width="37.1636364" cx="86.4054545" cy="420.878182" rx="67.8236364" ry="71.54"></ellipse>
-                    <rect id="Rectangle" fill="#4B4A4A" x="156.087273" y="0" width="111.490909" height="37.1636364" rx="18.5818182"></rect>
-                    <path d="M156.087273,0 L172.810909,0 L172.810909,0 L172.810909,421.807273 L137.505455,421.807273 L137.505455,18.5818182 C137.505455,8.31936338 145.824818,-1.5878386e-14 156.087273,0 Z" id="Rectangle" fill="#4B4A4A"></path>
+                    <ellipse id="Oval" stroke="#ff006a" stroke-width="37.1636364" cx="86.4054545" cy="420.878182" rx="67.8236364" ry="71.54"></ellipse>
+                    <rect id="Rectangle" fill="#ff006a" x="156.087273" y="0" width="111.490909" height="37.1636364" rx="18.5818182"></rect>
+                    <path d="M156.087273,0 L172.810909,0 L172.810909,0 L172.810909,421.807273 L137.505455,421.807273 L137.505455,18.5818182 C137.505455,8.31936338 145.824818,-1.5878386e-14 156.087273,0 Z" id="Rectangle" fill="#ff006a"></path>
                 </g>
             </g>
         </g>
