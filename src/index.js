@@ -60,7 +60,6 @@ class SequencePlayer {
       this.play()
     }
 
-    this.onToggle()
     this.on = !this.on
   }
 
@@ -89,6 +88,7 @@ class SequencePlayer {
     const numTracks = album.tracks.length
     if (this.trackN === numTracks - 1) {
       this.trackN = 0
+      this.nextAlbum()
     } else {
       this.trackN += 1
     }
@@ -96,7 +96,7 @@ class SequencePlayer {
 
   nextAlbum () {
     let numAlbums = this.albums.length
-    if (this.albumN === numAlbums) {
+    if (this.albumN === numAlbums - 1) {
       this.albumN = 0
     } else {
       this.albumN += 1
@@ -120,16 +120,30 @@ class SequencePlayer {
     
     audio.play()
 
+    const pause = () => {
+      that.onToggle()
+      that.updateView()
+    }
+
+    const play = () => {
+      that.onToggle()
+      that.updateView(that.album, that.track)
+    }
+
     if (start) {
       audio.addEventListener('ended', function end () {
         audio.removeEventListener('ended', end)
+        audio.removeEventListener('pause', pause)
+        audio.removeEventListener('play', play)
+
         delete that.audio
         that.updateView()
         that.play()
       })
-    }
 
-    this.updateView(this.album, this.track)
+      audio.addEventListener('pause', pause)
+      audio.addEventListener('play', play)
+    }
   }
 
   pause () {
