@@ -2,5 +2,26 @@
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2",
     "rambda": "^6.7.0"
-  }
+  },
+  "name": "delhi.fm",
+  "version": "0.0.1",
+  "main": "webpack.config.js",
+  "devDependencies": {
+    "webpack": "^5.37.0",
+    "webpack-cli": "^4.7.0"
+  },
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Debdut/delhi.fm.git"
+  },
+  "author": "Debdut Karmakar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Debdut/delhi.fm/issues"
+  },
+  "homepage": "https://github.com/Debdut/delhi.fm#readme",
+  "description": ""
 }
