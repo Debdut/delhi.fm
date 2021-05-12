@@ -4,7 +4,7 @@ window.addEventListener('load', async function onLoad () {
   const albums = await getAlbums()
   const controller = document.body
 
-  const player = new SequencePlayer(albums, controller, onToggle, updateView)
+  window.player = new SequencePlayer(albums, controller, onToggle, updateView)
 })
 
 function onToggle () {
@@ -72,7 +72,9 @@ class SequencePlayer {
       this.trackN = trackN
     }
 
-    const audioPath = this.track.path
+    const album = this.albums[this.albumN]
+    const track = album.tracks[this.trackN]
+    const audioPath = track.path
     const audio = new Audio(audioPath)
 
     this.audios.push(audio)
@@ -83,7 +85,8 @@ class SequencePlayer {
   }
 
   nextTrack () {
-    let numTracks = this.album.tracks.length
+    const album = this.albums[this.albumN]
+    const numTracks = album.tracks.length
     if (this.trackN === numTracks - 1) {
       this.trackN = 0
     } else {
@@ -100,39 +103,40 @@ class SequencePlayer {
     }
   }
 
-  get album () {
-    return this.albums[this.albumN]
-  }
-
-  get track () {
-    return this.album.tracks[this.trackN]
-  }
-
   play () {
-    this.updateView(this.album, this.track)
-
+    let start = false
     if (!this.audio) {
       this.audio = this.unloadTrack()
+      this.album = this.albums[this.albumN]
+      this.track = this.album.tracks[this.trackN]
+      start = true
+      
       this.nextTrack()
       this.loadTrack()
     }
-
+    
     const that = this
     const audio = this.audio
-
+    
     audio.play()
-    audio.addEventListener('ended', function end () {
-      audio.removeEventListener('ended', end)
-      delete that.audio
-      that.play()
-    })
+
+    if (start) {
+      audio.addEventListener('ended', function end () {
+        audio.removeEventListener('ended', end)
+        delete that.audio
+        that.updateView()
+        that.play()
+      })
+    }
+
+    this.updateView(this.album, this.track)
   }
 
   pause () {
-    this.updateView()
     if (this.audio) {
       this.audio.pause()
     }
+    this.updateView()
   }
 }
 
@@ -143,7 +147,9 @@ function updateView (album, track) {
   }
 
   if (!album && !track) {
-    view.parentNode.removeChild(view)
+    if (view && view.parentNode) {
+      view.parentNode.removeChild(view)
+    }
     return
   }
 
@@ -151,9 +157,11 @@ function updateView (album, track) {
   document.body.appendChild(view)
 
   setTimeout(function () {
-    document.querySelector('.player-view .back')
-    .classList.add('active')
-  }, 1000) 
+    const back = document.querySelector('.player-view .back')
+    if (back) {
+      back.classList.add('active')
+    }    
+  }, 200) 
   
 }
 
