@@ -46,15 +46,68 @@
       border-radius: 4px;
       background-color: #eee;
     }
+
+    header {
+      margin-top: -150px;
+      margin-left: 250px;
+      animation: fadein 6s;
+    }
+
+    header h1 {
+      font-size: 60px;
+    }
+
+    header p.instruction {
+      font-size: 20px;
+      font-weight: 400;
+    }
+
+    header span.action {
+      font-size: 16px;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
+
+    footer a {
+      text-decoration: none;
+      color: rgb(31, 116, 244);
+
+    }
+
+    @media only screen and (max-width: 600px) {
+      img {
+        width: 150px;
+        margin-left: 20px;
+      }
+
+      header {
+        margin-left: 150px;
+        margin-top: -250px;
+        width: 200px;
+      }
+
+      header h1 {
+        font-size: 40px;
+      }
+    }
   </style>
 </head>
-<body class="container mx-auto">
+<body>
   <main>
     <img src="assets/note.svg" />
-    <div style="margin-top: -150px; margin-left: 250px; animation: fadein 6s">
-      <h1 style="font-size: 60px;"> Delhi FM</h1>
-      <p style="font-size: 20px; font-weight: 400">Press <code style="font-size: 20px;">Space</code> or Tap to <span style="font-size: 16px;">▶️</span></p>
-    </div>
+    <header class="header">
+      <h1> Delhi FM</h1>
+      <p class="instruction">Press <code>Space</code> or Tap to <span class="action">▶️</span></p>
+    </header>
+
+    <footer>
+      <a target="_blank" href="https://www.buymeacoffee.com/debdut">❤️ Buy Me a Coffee</a>
+      <a target="_blank" href="https://twitter.com/KarmakarDebdut">🐦 Twitter</a>
+    </footer>
   </main>
 </body>
 <script src="main.js"></script>

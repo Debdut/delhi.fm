@@ -1,9 +1,22 @@
+import m from './m'
+
 window.addEventListener('load', async function onLoad () {
   const albums = await getAlbums()
   const controller = document.body
 
-  const player = new SequencePlayer(albums, controller)
+  const player = new SequencePlayer(albums, controller, onToggle, onAlbumChange)
 })
+
+function onToggle () {
+  const action = document.querySelector('header span.action')
+  if (action) {
+    if (action.innerText === '▶️') {
+      action.innerText = '⏸'
+    } else {
+      action.innerText = '▶️'
+    }
+  }
+}
 
 async function getAlbums () {
   const response = await fetch('albums.json')
@@ -13,13 +26,16 @@ async function getAlbums () {
 }
 
 class SequencePlayer {
-  constructor(albums, controller) {
+  constructor(albums, controller, onToggle, onAlbumChange) {
     this.albums = albums
     this.audios = []
     this.albumN = 2
     this.trackN = 0
+    this.onToggle = onToggle
+    this.onAlbumChange = onAlbumChange
 
     this.loadTrack()
+    this.onAlbumChange(this.album)
 
     const that = this
 
@@ -32,6 +48,10 @@ class SequencePlayer {
         that.toggle()
       }
     })
+
+    controller.addEventListener('touch', function onTouch () {
+      that.toggle()
+    })
   }
 
   toggle () {
@@ -40,6 +60,7 @@ class SequencePlayer {
     } else {
       this.play()
     }
+    this.onToggle()
     this.on = !this.on
   }
 
@@ -51,7 +72,7 @@ class SequencePlayer {
       this.trackN = trackN
     }
 
-    const audioPath = this.albums[this.albumN].tracks[this.trackN].path
+    const audioPath = this.album.tracks[this.trackN].path
     const audio = new Audio(audioPath)
 
     this.audios.push(audio)
@@ -62,7 +83,7 @@ class SequencePlayer {
   }
 
   nextTrack () {
-    let numTracks = this.albums[this.albumN].tracks.length
+    let numTracks = this.album.tracks.length
     if (this.trackN === numTracks - 1) {
       this.trackN = 0
       this.nextAlbum()
@@ -77,11 +98,15 @@ class SequencePlayer {
       this.albumN = 0
     } else {
       this.albumN += 1
+      this.onAlbumChange(this.album)
     }
   }
 
+  get album () {
+    return this.albums[this.albumN]
+  }
+
   play () {
-    console.log('play')
     if (!this.audio) {
       this.audio = this.unloadTrack()
       this.nextTrack()
@@ -100,9 +125,22 @@ class SequencePlayer {
   }
 
   pause () {
-    console.log('pause')
     if (this.audio) {
       this.audio.pause()
     }
   }
+}
+
+function onAlbumChange (album) {
+  const view = PlayerView(album)
+  document.body.appendChild(view)
+}
+
+function PlayerView (album) {
+  const view = m('div', { className: 'player-view' }, [
+    m('img', { src: album.cover }),
+    m('h2', album.title)
+  ])
+
+  return view
 }
