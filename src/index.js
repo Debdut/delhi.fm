@@ -2,18 +2,39 @@ import m from './m'
 
 window.addEventListener('load', async function onLoad () {
   const albums = await getAlbums()
-  const controller = document.body
+  const controllers = {
+    playPause: document.body,
+    shuffle: document.querySelector('.shuffle'),
+    next: document.querySelector('.next')
+  }
 
-  window.player = new SequencePlayer(albums, controller, onToggle, updateView)
+  const actions = {
+    playPause,
+    updateView,
+    shuffle
+  }
+
+  window.player = new MusicPlayer(albums, controllers, actions)
 })
 
-function onToggle () {
-  const action = document.querySelector('header span.action')
+function playPause () {
+  const action = document.querySelector('header span.toggle')
   if (action) {
     if (action.innerText === '▶️') {
       action.innerText = '⏸'
     } else {
       action.innerText = '▶️'
+    }
+  }
+}
+
+function shuffle () {
+  const action = document.querySelector('header span.shuffle')
+  if (action) {
+    if (action.innerText === '🔀') {
+      action.innerText = '🔁'
+    } else {
+      action.innerText = '🔀'
     }
   }
 }
@@ -25,32 +46,52 @@ async function getAlbums () {
   return albums
 }
 
-class SequencePlayer {
-  constructor(albums, controller, onToggle, updateView) {
+class MusicPlayer {
+  constructor(albums, controllers, actions) {
     this.albums = albums
     this.audios = []
     this.albumN = 2
     this.trackN = 0
-    this.onToggle = onToggle
-    this.updateView = updateView
+    this.shuffle = false
+    this.actions = actions
 
     this.loadTrack()
 
-    const that = this
+    const onPlay = () => {
+      this.toggle()
+    }
 
-    controller.addEventListener('click', function onClick () {
-      that.toggle()
-    })
+    const onShuffle = (event) => {
+      event.stopPropagation()
+      this.toggleShuffle()
+      this.actions.shuffle()
+    }
 
-    controller.addEventListener('keypress', function onKeyPress (event) {
+    const onNext = (event) => {
+      event.stopPropagation()
+      this.next()
+    }
+
+    controllers.playPause.addEventListener('click', onPlay)
+    controllers.playPause.addEventListener('touch', onPlay)
+
+    controllers.playPause.addEventListener('keydown', function onKeyPress (event) {
       if (event.code === 'Space') {
-        that.toggle()
+        onPlay()
+      } else if (event.code === 'ArrowRight') {
+        // right arrow key
+        onNext(event)
+      } else if (event.code === 'KeyS') {
+        // s key
+        onShuffle(event)
       }
     })
 
-    controller.addEventListener('touch', function onTouch () {
-      that.toggle()
-    })
+    controllers.shuffle.addEventListener('click', onShuffle)
+    controllers.shuffle.addEventListener('touch', onShuffle)
+
+    controllers.next.addEventListener('click', onNext)
+    controllers.next.addEventListener('touch', onNext)
   }
 
   toggle () {
@@ -61,6 +102,26 @@ class SequencePlayer {
     }
 
     this.on = !this.on
+  }
+
+  toggleShuffle () {
+    if (this.shuffle) {
+      // turn off shuffle
+
+      if (this.tempShuffle) {
+        this.albumN = this.tempShuffle.albumN
+        this.trackN = this.tempShuffle.trackN
+
+        delete this.tempShuffle
+      }
+    } else {
+      // turn off shuffle
+
+      const { albumN, trackN } = this
+      this.tempShuffle = { albumN, trackN }
+    }
+
+    this.shuffle = !this.shuffle
   }
 
   loadTrack (albumN, trackN) {
@@ -84,14 +145,33 @@ class SequencePlayer {
   }
 
   nextTrack () {
+    if (this.shuffle) {
+      this.randomTrack()
+
+      return
+    }
+
     const album = this.albums[this.albumN]
     const numTracks = album.tracks.length
+    
     if (this.trackN === numTracks - 1) {
       this.trackN = 0
       this.nextAlbum()
     } else {
       this.trackN += 1
     }
+
+  }
+
+  randomTrack () {
+    const numAlbums = this.albums.length
+    
+    this.albumN = getRandomInt(0, numAlbums - 1)
+    
+    const album = this.albums[this.albumN]
+    const numTracks = album.tracks.length
+
+    this.trackN = getRandomInt(0, numTracks - 1)
   }
 
   nextAlbum () {
@@ -121,13 +201,13 @@ class SequencePlayer {
     audio.play()
 
     const pause = () => {
-      that.onToggle()
-      that.updateView()
+      that.actions.playPause()
+      that.actions.updateView()
     }
 
     const play = () => {
-      that.onToggle()
-      that.updateView(that.album, that.track)
+      that.actions.playPause()
+      that.actions.updateView(that.album, that.track)
     }
 
     if (start) {
@@ -137,7 +217,7 @@ class SequencePlayer {
         audio.removeEventListener('play', play)
 
         delete that.audio
-        that.updateView()
+        that.actions.updateView()
         that.play()
       })
 
@@ -146,12 +226,27 @@ class SequencePlayer {
     }
   }
 
+  next () {
+    if (this.audio) {
+      this.audio.pause()
+      this.audio.currenTime = 0
+      const event = new Event('ended')
+      this.audio.dispatchEvent(event)
+    }
+  }
+
   pause () {
     if (this.audio) {
       this.audio.pause()
     }
-    this.updateView()
+    this.actions.updateView()
   }
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 let view
