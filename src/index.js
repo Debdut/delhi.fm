@@ -230,6 +230,7 @@ class MusicPlayer {
     if (this.audio) {
       this.audio.pause()
       this.audio.currenTime = 0
+      this.actions.playPause()
       const event = new Event('ended')
       this.audio.dispatchEvent(event)
     }
