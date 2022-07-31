@@ -1,0 +1,1 @@
+{"buildTargets":["all","build","build-go","build-preact","clean","fmt","help","init","lint","run","test","tidy","vet"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
